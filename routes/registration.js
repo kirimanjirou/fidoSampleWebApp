@@ -14,11 +14,6 @@ router.post('/createuser', function(req, res, next) {
   var email = req.body.email;
   var password = req.body.password;
   var name = req.body.name;
-  var doc = {
-	name: name,
-	email: email,
-	password_hash: "crypt('" + password + "', gen_salt('bf'))"
-	}
   db.none("INSERT INTO users (name,email, password_hash) VALUES (" + "'" + name + "','" + email  + "'," + "crypt('" + password + "', gen_salt('bf')))")
 	.then(function(){
           res.redirect('/');
