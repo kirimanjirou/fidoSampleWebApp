@@ -6,33 +6,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="javascripts/bootstrap.min.js"></script>
 
-<script language="javascript">
-function sign() {
-  var credID = document.getElementById('credID').value;
-  var challenge = document.getElementById('challenge').title;
-  var filters = {
-    accept:[
-      {
-        type: 'FIDO_2_0',
-        id: credID
-      }
-    ]
-  };
-  msCredentials.getAssertion(challenge, filters)
-  .then(function(result) {
-    //for debugging
-    document.getElementById('signature').value = result.signature.signature;    
-    document.getElementById('authnrdata').value = result.signature.authnrData;    
-    document.getElementById('clientdata').value = result.signature.clientData;    
-  }).catch(function (err) {
-    alert('err: ' + err.message);
-  });
-}
-
-</script>
 
   <head>
-    <title>FIDO2.0 Authentication</title>
+    <title>FIDOU2F Authentication</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
 
@@ -43,14 +19,14 @@ function sign() {
       <div class="container-fluid">
          <div class="navbar-header">
 	    <a class="navbar-brand" href="#">
-	       FIDO 2.0 Authentication
+	       FIDO U2F Authentication
 	    </a>
 	 </div>
       </div>
     </nav>
 
     <h3><p class="text-danger"><%= err %></p></h3>
-    <h1>FIDO2.0 Authentication</h1>
+    <h1>FIDO U2F Authentication</h1>
     <p>FIDO Sample Application</p>
 
     <h2> STEP1.User Create </h2>
@@ -75,42 +51,17 @@ function sign() {
     </form>
 </div>
 
+    <h2> STEP4.U2F Sign-In</h2>
+
+    <form action="/u2f_authentication" method="post" class="login-form">
+      <div class="form-group">
+        <label for="exampleInputEmail1">Email address</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email" name="email">
+      </div>
+      </div>
+
 <div>
-   <h2>STEP4. FIDO Sign-In</h2>
-   <div>
-     At first, paste your "Credencial ID". <br>
-     Then, push "FIDO_GET_ASSERTION" Button. <br>
-     Finally, push "FIDO_Authentication" <br>
-  <p>
-   </div>
-      <div>
-        <button onclick="sign()" class="btn btn-primary btn-sm" style="WIDTH: 180px;">FIDO_GET_ASSERTION</button>
-      </div>
- <p>
-   <form action="/fido_authentication" method="post" class="fido">
-      <div class="form-group">
-        <label for="credencialID">Credential ID</label>
-        <input type="text" class="form-control" id="credID" placeholder="credentialID" name="credID">
-      </div>
-
-      <div class="form-group">
-         <label for="signature">Signature</label>
-         <input type="text" class="form-control" id="signature" placeholder="Signature" name="signature">
-      </div>
-
-      <div class="form-group">
-         <label for="authnrdata">Authnr Data</label>
-         <input type="text" class="form-control" id="authnrdata" placeholder="Authnr Data" name="authnrdata">
-      </div>
-
-   <div class="form-group">
-         <label for="clientdata">Client Data</label>
-         <input type="json" class="form-control" id="clientdata" placeholder="Client Data" name="clientdata">
-   </div>
-
-      <div>
-        <button type="submit" class="btn btn-primary btn-sm" style="WIDTH: 180px;">FIDO_Authentication!</button>
-      </div>
+      <button type="submit" class="btn btn-primary btn-sm" style="WIDTH: 180px;">Sign-In</button>
     </form>
 </div>
 

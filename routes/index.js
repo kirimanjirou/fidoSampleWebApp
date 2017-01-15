@@ -42,4 +42,32 @@ router.post('/', function(req, res, next) {
 	});
 });
 
+/ *U2F Login. */
+
+router.post('/u2f_authentication', function(req, res, next) {
+  var email = req.body.email;
+  db.query("SELECT name,u2f_keyhandle FROM users WHERE email = '" + email + "';")
+        .then(function(result){
+          if (result){
+            var dbresult = result[0]
+            console.log(dbresult);
+            var username = dbresult.name;
+            var keyHandle = dbresult.u2f_keyhandle;
+	    var challenge = fidoSampleWebFunction.getUniqueStr();
+            req.session.challenge = challenge
+            res.render('u2fauth', { err: "",
+                                  username: username ,
+                                  keyHandle: keyHandle ,
+				  challenge: challenge
+            });
+          }else{
+            fidoSampleWebFunction.goToIndex(req,res,"Please confirm your email");
+          }
+        })
+        .catch(function(error){
+          console.log("DB_ERR : " + error);
+          fidoSampleWebFunction.goToIndex(req,res,"Please confirm your email");
+        });
+});
+
 module.exports = router;

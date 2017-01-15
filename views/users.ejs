@@ -5,29 +5,32 @@
 <link href="stylesheets/bootstrap.min.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="javascripts/bootstrap.min.js"></script>
-<script src="javascripts/webauthn.js"></script>
+<script src="javascripts/u2f-api.js"></script>
+
 <script language="javascript">
 
-function make() {
-var username = document.getElementById( 'username' ).title;
-  var accountInfo = {
-    rpDisplayName: 'fidoSampleWeb', // Name of relying party
-    userDisplayName: username // Name of user account
+
+function register() {
+	var username = document.getElementById( 'username' ).title;
+	var registerRequest = {
+		appId: "https://kirimanjirou.com:3334",
+		challenge: "aubUD228hfCtApQ6DDpD9srlidsusUegcWrAcyFIMfU",
+		version: "U2F_V2"
   };
-  var cryptoParameters = [
-    {
-      type: 'ScopedCred',  // also 'FIDO_2_0' is okay !
-      algorithm: 'RSASSA-PKCS1-v1_5'
-    }
-  ];
-  navigator.authentication.makeCredential(accountInfo, cryptoParameters)
-  .then(function (result) {
-    document.getElementById('credID').value = result.credential.id;
-    document.getElementById('publicKey').value = JSON.stringify(result.publicKey);
-  }).catch(function (err) {
-      alert('err: ' + err.message);
+
+  u2f.register("https://kirimanjirou.com:3334",[registerRequest], [], function (result) {
+	  if (result.errorCode) {
+    document.getElementById('status')
+      console.log("Failed. Error code: " + result.errorCode);
+    return;
+	  }
+	console.log(result);
+
+	    document.getElementById('registrationData').value = result.registrationData;
+	    document.getElementById('clientData').value = result.clientData;
   });
 }
+
 
 </script>
 
@@ -52,34 +55,33 @@ var username = document.getElementById( 'username' ).title;
       </div>
     </nav>
 
-    <h3><p class="text-danger"><%= err %></p></h3> 
+    <h3><p class="text-danger"><%= err %></p></h3>
 
     <h1>FIDO2.0 Authentication</h1>
 <div>
  This is user page. <br>
- Please push "FIDO_MAKE_CREDENTIAL" Buttun. <br>
- Memolize or Copy "Credencial ID". <br>
+ Please push "Register_U2F_Authenitcator" Buttun. <br>
  Push "Send Server!" to FIDO Registration. <br>
 </div>
 
 <div>
    <h2>STEP3.FIDO Registration</h2>
    <div>
-     <button onclick="make()" class="btn btn-primary btn-sm" style="WIDTH: 180px;">FIDO_MAKE_CREDENTIAL</button>
+     <button onclick="register()" class="btn btn-primary btn-sm" style="WIDTH: 180px;">Register_U2F_Authenitcator</button>
    </div>
    <p>
    <form action="/fido_registration" method="post" class="fido">
       <div class="form-group">
-         <label for="credID">Credential ID</label>
-         <input type="text" class="form-control" id="credID" placeholder="credential ID" name="credID">
+         <label for="registrationData">key handle</label>
+         <input type="text" class="form-control" id="registrationData" placeholder="Registration Data" name="registrationData">
       </div>
 
       <div class="form-group">
-         <label for="publicKey">Publick Key</label>
-         <input type="json" class="form-control" id="publicKey" placeholder="Public Key" name="publicKey">
+         <label for="clientData">Publick Key</label>
+         <input type="text" class="form-control" id="clientData" placeholder="Client Data" name="clientData">
       </div>
 
-      <div> 
+      <div>
         <button type="submit" class="btn btn-primary btn-sm" style="WIDTH: 180px;">Send Server!</button>
       </div>
     </form>
@@ -93,3 +95,5 @@ var username = document.getElementById( 'username' ).title;
 
   </body>
 </html>
+
+

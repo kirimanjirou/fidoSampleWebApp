@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="javascripts/bootstrap.min.js"></script>
+  <script src="javascripts/u2f-api.js"></script>
+  <script language="javascript">
+
+function sign() {
+//	var challenge = document.getElementById( 'challenge' ).title;
+	var challenge = 'UGFzczEyMzQ=';
+	var appID =  'https://kirimanjirou.com:3334';
+
+        var registeredKey = new Array();
+	var reqs = {
+		appID: 'https://kirimanjirou.com:3334',
+                keyHandle: document.getElementById( 'keyHandle' ).title ,
+                challenge: 'UGFzczEyMzQ=',
+                version: "U2F_V2"
+  	}
+	registeredKey.push(reqs);
+
+  u2f.sign(appID, challenge, registeredKey,  function (result) {
+          if (result.errorCode) {
+    document.getElementById('status')
+      console.log("Failed. Error code: " + result.errorCode);
+    return;
+          }
+        console.log(result);
+
+            document.getElementById('registrationData').value = result.registrationData;
+            document.getElementById('clientData').value = result.clientData;
+  });
+}
+
+
+</script>
+
+  <head>
+    <title>FIDOU2F Authentication</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+
+  <body>
+    <div id="keyHandle" title= <%= keyHandle %> />
+    <div id="challenge" title= "<%= challenge %>" />
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+         <div class="navbar-header">
+	    <a class="navbar-brand" href="#">
+	       FIDO U2F Authentication
+	    </a>
+	 </div>
+      </div>
+    </nav>
+
+    <h3><p class="text-danger"><%= err %></p></h3>
+    <h1>FIDO U2F Authentication</h1>
+    <p>FIDO Sample Application</p>
+
+
+    <h2> STEP5.U2F Authentication</h2>
+   <div>
+     <button onclick="sign()" class="btn btn-primary btn-sm" style="WIDTH: 180px;">Register_U2F_Authenitcator</button>
+   </div>
+   <p>
+   <form action="/fido_authentication" method="post" class="fido">
+      <div class="form-group">
+         <label for="aaa">key handle</label>
+         <input type="text" class="form-control" id="registrationData" placeholder="Registration Data" name="registrationData">
+      </div>
+
+      <div class="form-group">
+         <label for="clientData">Publick Key</label>
+         <input type="text" class="form-control" id="clientData" placeholder="Client Data" name="clientData">
+      </div>
+
+<div>
+      <button type="submit" class="btn btn-primary btn-sm" style="WIDTH: 180px;">U2F Authentication!</button>
+    </form>
+</div>
+
+  </body>
+</html>
