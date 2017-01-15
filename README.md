@@ -1,3 +1,3 @@
 # fidoSampleWebApp
 fido U2F SampleWebApp for node.js SampleSite is=> https://kirimanjirou.com:3334
-notice: Now still working...
+notice: using chrome or firefox.

@@ -21,29 +21,67 @@ router.post('/', function(req, res, next) {
        if(result){
        var dbresult = result[0]
            try {
-	     console.log("DB Result :" + dbresult);
-	     console.log("--------------------");
              var  publicKey = dbresult.u2f_publickey
              var s = new Buffer(signature64, 'base64');
-	     var ss = s.slice(0,5);
-	     console.log("User presence & counter :" + ss.toString("hex"));
+	     var userPresenceFlag  = s.slice(0,1);
+             var counter  = s.slice(1,5);
+	     console.log("User presence flag:" + userPresenceFlag.toString("hex"));
              console.log("--------------------");
-	     var c = s.slice(5);
-	     console.log("signature:" + c.toString("hex"));
+             console.log("counter:" + counter.toString("hex"));
              console.log("--------------------");
-	     var clientData = URLSafeBase64.decode(clientData64);
-             var clientDataJSON = JSON.parse(clientData);
-	     console.log("client data:" + clientData);
+	     var signature = s.slice(5);
+	     console.log("signature:" + signature.toString("hex"));
+             console.log("--------------------");
+	     var clientDataStr = URLSafeBase64.decode(clientData64);
+             var clientDataJSON = JSON.parse(clientDataStr);
+	     console.log("client data:" + clientDataStr);
              console.log("challenge:" + clientDataJSON.challenge);
              console.log("--------------------");
            }catch(e){
              console.log("VERIFY_ERR : " + e);
            }
 
-         if(clientDataJSON.challenge == challenge){
-	 /* Verify Signature */
-         /*     doing...     */
+         if(clientDataJSON.challenge !== challenge){ fidoSampleWebFunction.goToIndex(req,res,"Verify is failed.(Challenge Unmatched)"); }
 
+	 /* Verify Signature */
+	 var cEnd = fidoSampleWebFunction.asnLen(signature);
+	 if (cEnd !== signature.length) { fidoSampleWebFunction.goToIndex(req,res,"Invalid Request(signatureData has extra bytes)"); }
+         
+	 const a_hash = crypto.createHash('sha256');
+ 	 var appIdHash = a_hash.update("https://kirimanjirou.com:3334").digest();
+
+         const c_hash = crypto.createHash('sha256');
+	 var clientData = new Buffer (clientData64, 'base64');
+         var clientDataHash = c_hash.update(clientData).digest();
+
+	 var signatureBase = Buffer.concat([appIdHash, userPresenceFlag, counter, clientDataHash]);
+	 console.log("signatureBase:");
+	 console.log(signatureBase.toString("hex"));
+	 console.log("--------------------");         
+
+         publicKeyBuf = new Buffer(publicKey, 'base64');
+         console.log("publicKeyBuf:")
+         console.log(publicKeyBuf.toString("hex"));
+         console.log("BufLength:" + publicKeyBuf.length);
+         //add ASN1 format.
+         publicKeyBufConstASN =  Buffer.concat([ new Buffer("3059301306072a8648ce3d020106082a8648ce3d030107034200", "hex"), publicKeyBuf]);
+         console.log("--------------------");
+
+         var pemStr = "-----BEGIN PUBLIC KEY-----\n";
+  	 for (var certStr = publicKeyBufConstASN.toString('base64'); certStr.length > 64; certStr = certStr.slice(64))
+  	 pemStr += certStr.slice(0, 64) + '\n';
+ 	 pemStr += certStr + '\n';
+ 	 pemStr += "-----END PUBLIC KEY-----\n";
+	 userPublicKey = pemStr;
+
+         console.log("userPublicKey:");
+         console.log(userPublicKey);
+
+	 const verify = crypto.createVerify("RSA-SHA256");
+  	 verify.update(signatureBase);
+  	 var flag = verify.verify(userPublicKey, signature);
+
+	 if (flag){
               var username = dbresult.name;
               var user_email = dbresult.email;
               req.session.challenge = challenge
@@ -55,17 +93,18 @@ router.post('/', function(req, res, next) {
                                     user_email: user_email,
 				    challenge
 				  });         
-           }else{
-	     fidoSampleWebFunction.goToIndex(req,res,"Verify is failed(Challenge Unmatched).");
-           }
-   
+	 }else{
+ 	      fidoSampleWebFunction.goToIndex(req,res,"Verify is failed.");
+	 }
+
       }else{
         fidoSampleWebFunction.goToIndex(req,res,"Invalid Request");
       }
+
     })
 
     .catch(function(error){
-      console.log("DB_ERR : " + error);
+      console.log("ERR : " + error);
       fidoSampleWebFunction.goToIndex(req,res,"Invalid Request");
     });
 
