@@ -9,15 +9,14 @@
   <script language="javascript">
 
 function sign() {
-//	var challenge = document.getElementById( 'challenge' ).title;
-	var challenge = 'UGFzczEyMzQ=';
+	var challenge = document.getElementById( 'challenge' ).title;
 	var appID =  'https://kirimanjirou.com:3334';
 
         var registeredKey = new Array();
 	var reqs = {
 		appID: 'https://kirimanjirou.com:3334',
                 keyHandle: document.getElementById( 'keyHandle' ).title ,
-                challenge: 'UGFzczEyMzQ=',
+                challenge: challenge,
                 version: "U2F_V2"
   	}
 	registeredKey.push(reqs);
@@ -30,8 +29,9 @@ function sign() {
           }
         console.log(result);
 
-            document.getElementById('registrationData').value = result.registrationData;
+            document.getElementById('resultKeyHandle').value = result.keyHandle;
             document.getElementById('clientData').value = result.clientData;
+            document.getElementById('signatureData').value = result.signatureData;
   });
 }
 
@@ -64,24 +64,34 @@ function sign() {
 
     <h2> STEP5.U2F Authentication</h2>
    <div>
-     <button onclick="sign()" class="btn btn-primary btn-sm" style="WIDTH: 180px;">Register_U2F_Authenitcator</button>
+     <button onclick="sign()" class="btn btn-primary btn-sm" style="WIDTH: 180px;">Sign_U2F_Authenitcator</button>
    </div>
    <p>
    <form action="/fido_authentication" method="post" class="fido">
       <div class="form-group">
-         <label for="aaa">key handle</label>
-         <input type="text" class="form-control" id="registrationData" placeholder="Registration Data" name="registrationData">
+         <label for="resultKeyHandle">Key Handle</label>
+         <input type="text" class="form-control" id="resultKeyHandle" placeholder="Key Handle" name="resultKeyHandle">
       </div>
 
       <div class="form-group">
-         <label for="clientData">Publick Key</label>
+         <label for="clientData">Client Data</label>
          <input type="text" class="form-control" id="clientData" placeholder="Client Data" name="clientData">
+      </div>
+
+      <div class="form-group">
+         <label for="signatureData">Signature Data</label>
+         <input type="text" class="form-control" id="signatureData" placeholder="Signature Data" name="signatureData">
       </div>
 
 <div>
       <button type="submit" class="btn btn-primary btn-sm" style="WIDTH: 180px;">U2F Authentication!</button>
     </form>
 </div>
+
+  <h2> Back to Index </h2>
+  <div>
+  <a href="/"> <button type="submit" class="btn btn-default btn-sm" style="WIDTH: 180px;">Back</button></a>
+  </div>
 
   </body>
 </html>

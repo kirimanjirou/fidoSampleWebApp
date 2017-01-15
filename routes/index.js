@@ -25,12 +25,15 @@ router.post('/', function(req, res, next) {
 	    console.log(dbresult);
             var username = dbresult.name;
             var user_email = dbresult.email;
+	    var challenge = fidoSampleWebFunction.getUniqueStr();
             req.session.user_id = dbresult.oid;
             req.session.username = dbresult.name;
             req.session.user_email = dbresult.email;
+	    req.session.challenge = challenge;
             res.render('users', { err: "",
                                   username: username ,
-                                  user_email: user_email
+                                  user_email: user_email,
+				  challenge: challenge
             });
           }else{
             fidoSampleWebFunction.goToIndex(req,res,"Please confirm your email or password.");

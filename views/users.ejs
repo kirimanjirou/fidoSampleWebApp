@@ -11,10 +11,11 @@
 
 
 function register() {
+	var challenge = document.getElementById( 'challenge' ).title;
 	var username = document.getElementById( 'username' ).title;
 	var registerRequest = {
 		appId: "https://kirimanjirou.com:3334",
-		challenge: "aubUD228hfCtApQ6DDpD9srlidsusUegcWrAcyFIMfU",
+		challenge: challenge,
 		version: "U2F_V2"
   };
 
@@ -33,7 +34,7 @@ function register() {
 
 
 </script>
-
+  <div id="challenge" title= "<%= challenge %>" />
   <div id="username" title= <%= user_email %> />
   <head>
     <title>FIDO2.0 Authentication</title>
@@ -67,7 +68,7 @@ function register() {
 <div>
    <h2>STEP3.FIDO Registration</h2>
    <div>
-     <button onclick="register()" class="btn btn-primary btn-sm" style="WIDTH: 180px;">Register_U2F_Authenitcator</button>
+     <button onclick="register()" class="btn btn-primary btn-sm" style="WIDTH: 180px;">Register_U2F_Register</button>
    </div>
    <p>
    <form action="/fido_registration" method="post" class="fido">
